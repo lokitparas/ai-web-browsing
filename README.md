@@ -1,106 +1,120 @@
 # AI Web Browsing Agent
 
-An autonomous AI agent that, given a URL and a task in natural language, can browse the webpage and perform tasks.
+An autonomous web browsing agent powered by Selenium, undetected_chromedriver, and GPT-4o. This agent can navigate websites, interact with elements, and complete tasks with minimal human intervention.
 
 ## Features
 
-- **Natural Language Instructions**: Tell the agent what you want to do on a website
-- **Autonomous Navigation**: The agent can scroll, click, and analyze webpages
-- **Real-time Screenshots**: See what the agent sees as it browses
-- **Powered by GPT-4o**: Uses OpenAI's advanced language model for decision making
+- **AI-Driven Navigation**: Uses GPT-4o to make decisions about where to click, hover, or scroll
+- **Anti-Bot Detection**: Uses undetected_chromedriver to bypass common bot detection systems
+- **Smart URL Selection**: LLM analyzes all possible links to choose the most relevant for your task
+- **Multi-Strategy Interaction**: Multiple approaches to find and interact with elements
+- **Comprehensive Element Finding**: Searches in main DOM, iframes, and shadow DOM
+- **Automatic Selector Repair**: Fixes LLM-generated selectors to improve success rate
+- **Visual Change Detection**: Uses screenshots to verify successful interactions
+- **Advanced Logging**: Detailed logs for tracking actions and diagnosing issues
 
 ## Architecture
 
-- **Backend**: Python FastAPI application with Playwright for web automation
-- **Frontend**: React/Next.js application with a modern UI
-- **Communication**: WebSockets for real-time updates
+The project consists of two main components:
 
-## Prerequisites
+1. **Backend**: 
+   - `backend/app/browser_agent.py`: Core agent logic for browser control and AI decisions
+   
+2. **Frontend**: 
+   - `frontend/app.py`: Streamlit-based UI for setting tasks and viewing progress
 
-- Python 3.8+
-- Node.js 16+
-- npm or yarn
-- OpenAI API key
+## Requirements
 
-## Setup
+- Python 3.10+ (recommended, may work with 3.8+)
+- Chrome browser installed
+- OpenAI API key with access to GPT-4o
 
-### Backend
+## Installation
 
-1. Navigate to the backend directory:
-   ```
-   cd backend
-   ```
-
-2. Install Python dependencies:
-   ```
-   pip install -r requirements.txt
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/ai-web-browsing.git
+   cd ai-web-browsing
    ```
 
-3. Install Playwright browsers:
-   ```
-   playwright install
-   ```
-
-4. Create a .env file from the example:
-   ```
-   cp .env.example .env
+2. Create a virtual environment:
+   ```bash
+   python -m venv ai-web-agent
+   source ai-web-agent/bin/activate  # On Windows: ai-web-agent\Scripts\activate
    ```
 
-5. Add your OpenAI API key to the .env file:
+3. Install dependencies:
+   ```bash
+   pip install streamlit undetected-chromedriver==3.5.3 --no-deps selenium webdriver-manager openai python-dotenv Pillow numpy
+   ```
+
+4. Set up your API key by creating a `.env` file:
    ```
    OPENAI_API_KEY=your_api_key_here
    ```
 
-### Frontend
-
-1. Navigate to the frontend directory:
-   ```
-   cd frontend
-   ```
-
-2. Install Node.js dependencies:
-   ```
-   npm install
-   # or
-   yarn
-   ```
-
-## Running the Application
-
-### Backend
-
-1. Start the FastAPI server:
-   ```
-   cd backend
-   python run.py
-   ```
-
-### Frontend
-
-1. Start the Next.js development server:
-   ```
-   cd frontend
-   npm run dev
-   # or
-   yarn dev
-   ```
-
-2. Open your browser and navigate to http://localhost:3000
-
 ## Usage
 
-1. Enter a URL of the website you want to navigate
-2. Provide a natural language instruction for what you want the agent to do
-3. Click "Start Browsing" and watch as the agent attempts to complete your task
-4. The left panel shows the chat history and the right panel displays screenshots of what the agent sees
+1. Start the Streamlit interface:
+   ```bash
+   streamlit run frontend/app.py
+   ```
 
-## Limitations
+2. Enter a URL and task instructions (e.g., "Find credit cards with no annual fee")
 
-- The agent may struggle with highly dynamic websites or complex interactions
-- Navigation is limited to scrolling and clicking
-- Some websites may block automated browsers
-- The agent works best with clear, specific instructions
+3. Click "Execute Task" and watch the agent:
+   - Navigate to the website
+   - Analyze the page content
+   - Make decisions about which actions to take
+   - Perform clicks, hovers, and scrolls
+   - Complete your task
+
+## How It Works
+
+1. **Initialization**: Sets up an undetected Chrome browser instance
+2. **Navigation**: Loads the specified URL
+3. **Analysis**: The LLM analyzes the page content and decides what to do next
+4. **Action Execution**: The agent performs the selected action:
+   - Clicking links or buttons
+   - Hovering over elements (especially for navigation menus)
+   - Scrolling the page to find more content
+5. **Iteration**: The agent repeats the analysis and action until the task is complete
+
+## Key Capabilities
+
+### Smart URL Selection
+
+When the agent encounters multiple potential links to click, it sends all extracted URLs to the LLM with the original task. The LLM analyzes each URL and selects the most relevant one for the task.
+
+### Multi-Domain Element Finding
+
+The agent looks for elements across:
+- Main document DOM
+- All iframes
+- Shadow DOM elements
+- Dynamically generated content
+
+### Self-Healing Selectors
+
+If a selector fails, the agent will:
+1. Try to repair it (e.g., converting exact match to contains)
+2. Generate alternative selectors
+3. Use different strategies to find elements
+
+### Advanced Click Strategies
+
+The agent uses multiple approaches to click elements:
+1. Direct Selenium click
+2. ActionChains click
+3. JavaScript click
+4. Removing overlays and retrying
+
+## Troubleshooting
+
+- **Navigation Failure**: Try running with `headless=False` to see what's happening
+- **Selector Issues**: Check logs for element not found errors, might need to adjust selector format
+- **Bot Detection**: Some sites have advanced protection, try visible mode (headless=False)
 
 ## License
 
-MIT 
+MIT License 
